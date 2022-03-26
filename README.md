@@ -20,8 +20,6 @@
     - [RPM-Based Package Managers](#rpm-based-package-managers)
     - [Debian-Based Package Managers](#debian-based-package-managers)
     - [Arch-Based Package Managers](#arch-based-package-managers)
-    - []()
-    - []()
 
 ---
 
