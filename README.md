@@ -32,7 +32,12 @@
     - [ps](#ps)
     - [Htop - Linux Process Monitoring](#htop---linux-process-monitoring)
     - [Lsof - List Open Files](#lsof---list-open-files)
-    - [monit]()
+    - [monit](#monit)
+7. [Memory: Monitoring Usage and Tuning](#memory-monitoring-usage-and-tuning)
+    - [Profiling Application Memory Usage with Valgrind](#profiling-application-memory-usage-with-valgrind)
+8. [I/O Monitoring and Tuning](#io-monitoring-and-tuning)
+9. [I/O Scheduling](#io-scheduling)
+10. [Linux Filesystems and the VFS](#linux-filesystems-and-the-vfs)
 ---
 
 ## Linux Filesystem Tree Layout
@@ -67,6 +72,8 @@
 - **sbin directory** is reserved for programs essential for booting, restoring and recovering.
 - For example, `fsck`, a filesystem check and repair utility, or `reboot`, restart the system.
 - Because of the need for privileged access, the directory is not part of default `$PATH` environmental variables. `$PATH` contains the paths where ordinary users search to look up their binaries and there is no need for root access to search these paths.
+
+**[Go to Top](#contents)**
 
 **/usr directory**
 
@@ -126,6 +133,8 @@
 - This directory is a virtual filesystem, which means the files live on memory and disappear after shutdown.
 - In essence /sys allows you to get information about the system and its components in a structured way.
 
+**[Go to Top](#contents)**
+
 **/dev directory**
 
 - This is where your device files reside. These files allow application programs to interact with your hardware devices.
@@ -172,6 +181,8 @@
 - [Linux File System 101](https://medium.com/swlh/linux-file-system-101-894141449257#:~:text=Linux%20file%20system%20follows%20a%20tree%2Dlike%20hierarchical%20structure%20starting,maintained%20by%20the%20Linux%20Foundation.)
 - [A source about file systems reflection on the physical hard drive](https://medium.com/consonance/file-systems-an-in-depth-intro-75de31a0e50a)
 - [Unix/Linux File Systems](http://teaching.idallen.com/cst8207/13w/notes/450_file_system.html)
+
+**[Go to Top](#contents)**
 
 ## Processes
 
@@ -221,6 +232,8 @@ command -V jobs
 |`-s`|Restrict output to stopped jobs only.|
 |`-x`|COMMAND is run after all job specifications that appear in ARGS have been replaced with the process ID of that job’s process group leader.|
 
+**[Go to Top](#contents)**
+
 ### Daemons
 
 - These are special types of background processes that start at system startup and keep running forever as a service; they don’t die.
@@ -247,6 +260,8 @@ command -V jobs
 - Once you run a command or program, it will start a process in the system. You can start a foreground (interactive) process as follows, it will be connected to the terminal and a user can send input it.
 
 - To start a process in the background (non-interactive), use the & symbol, here, the process doesn’t read input from a user until it’s moved to the foreground.
+
+**[Go to Top](#contents)**
 
 ### States of a Process in Linux
 
@@ -322,6 +337,8 @@ PID  TTY         TIME CMD
 - [LINUX PROCESSES AND SIGNALS](https://www.bogotobogo.com/Linux/linux_process_and_signals.php)
 - [Kill All Stopped Jobs Linux](https://linuxhint.com/kill-all-stopped-jobs-linux/)
 
+**[Go to Top](#contents)**
+
 ## Signals
 
 - **Signal** is a notification, a message sent by either operating system or some application to our program.
@@ -356,6 +373,8 @@ PID  TTY         TIME CMD
 - [Unix / Linux - Signals and Traps](https://www.tutorialspoint.com/unix/unix-signals-traps.htm)
 - [LINUX PROCESSES AND SIGNALS](https://www.bogotobogo.com/Linux/linux_process_and_signals.php)
 
+**[Go to Top](#contents)**
+
 ## Package Management Systems
 
 - **Packages** collect multiple data files together into a single archive file for easier portability and storage, or simply compress files to reduce storage space.
@@ -379,6 +398,8 @@ PID  TTY         TIME CMD
 - Its primary use is to install RPMs, which you have locally, not to search software repositories. The package manager named **up2date** was created to inform users of updates to packages and enable them to search remote repositories and easily install dependencies.
 - Yellowdog Updater (YUP) was developed in 1999-2001 by folks at Terra Soft Solutions as a back-end engine for a graphical installer of Yellow Dog Linux. Duke University liked the idea of YUP and decided to improve upon it. They created Yellowdog Updater, Modified (yum) which was eventually adapted to help manage the university's Red Hat Linux systems. Today, almost every distribution of Linux that uses RPMs uses yum for package management.
 
+**[Go to Top](#contents)**
+
 **Zypper**
 
 - Zypper is another package manager meant to help manage RPMs.
@@ -394,6 +415,8 @@ PID  TTY         TIME CMD
 - Debian does not support PPAs(Personal Package Archive) natively.
 - Note that most of the current tutorials for Ubuntu specifically have taken to simply using apt. The single apt command was designed to implement only the most commonly used commands in the APT arsenal.
 - Since functionality is split between apt-get, apt-cache, and other commands, apt looks to unify these into a single command.
+
+**[Go to Top](#contents)**
 
 ### Arch-Based Package Managers
 
@@ -453,6 +476,8 @@ PID  TTY         TIME CMD
 |- for prints help `-? \| --help`||
 ---
 
+**[Go to Top](#contents)**
+
 |DPKG|APT|
 |---|----|
 |- dpkg(1) is the lowest level tool for the Debian package management. |- Repository based package management operations on the Debian system can be performed by many APT-based package management tools available on the Debian system.|
@@ -480,6 +505,8 @@ PID  TTY         TIME CMD
 |- The dpkg-statoverride command : Stat overrides provided by the dpkg-statoverride(8) command are a way to tell dpkg(1) to use a different owner or mode for a file when a package is installed.|N/A|
 |- The dpkg-divert command : File diversions provided by the dpkg-divert(8) command are a way of forcing dpkg(1) not to install a file into its default location, but to a diverted location. |N/A|
 |- `dpkg --configure -a` : configure all partially installed packages with the following command.|N/A|
+
+**[Go to Top](#contents)**
 
 **References**
 
@@ -511,6 +538,8 @@ PID  TTY         TIME CMD
 - It is extremely useful in analyzing current and recent recorded system performance.
 - Most Linux distributions provide sar utility binary in the sysstat package.
 
+**[Go to Top](#contents)**
+
 ### atop
 
 - **atop** is a very powerful and an interactive monitor to view the load on a Linux system.
@@ -526,6 +555,8 @@ PID  TTY         TIME CMD
 - `# atop -s`: Display scheduling-related process-info
 - `# atop -v` : Display various process-info (ppid, user/group, date/time)
 - `# atop -c` : Display command line per process
+
+**[Go to Top](#contents)**
 
 ### VmStat - Virtual Memory Statistics
 
@@ -551,6 +582,8 @@ $ sudo pacman -S sysstat        [On Arch Linux]
 - `$ vmstat -s` : vmstat command with `-s` switch displays summary of various event counters and memory statistics.
 - `$ vmstat -d` : vmstat with `-d` option display all disks statistics of Linux.
 - `$ vmstat -S M 1 5` : The vmstat displays memory statistics in kilobytes by default, but you can also display reports with memory sizes in megabytes with the argument `-S M`.
+
+**[Go to Top](#contents)**
 
 ### Other Command Line Tools to Monitor Linux Performance (for System and Network)
 
@@ -582,6 +615,8 @@ $ sudo pacman -S sysstat        [On Arch Linux]
 - [linux server administration/sar](https://en.wikiversity.org/wiki/Linux_server_administration/sar#:~:text=sar%20(System%20Activity%20Report)%20is,and%20recent%20recorded%20system%20performance.)
 - [CentOS / RHEL: Install atop (Advanced System & Process Monitor) Utility](https://www.cyberciti.biz/faq/centos-redhat-linux-install-atop-command-using-yum/)
 
+**[Go to Top](#contents)**
+
 ## Process Monitoring
 
 ### TOP
@@ -608,6 +643,8 @@ $ sudo pacman -S sysstat        [On Arch Linux]
 - `i` options, to get the list of idle/sleeping processes.
 - `h` option to obtain the top command help.
 
+**[Go to Top](#contents)**
+
 ### ps
 
 - **ps** command will report a snapshot of the current processes.
@@ -620,6 +657,8 @@ $ sudo pacman -S sysstat        [On Arch Linux]
 - `# ps -AlFH` : Display Threads ( LWP and NLWP)
 - `# ps -AlLm` : Watch Threads After Processes
 - `# ps axu` : Print All Process On The Server
+
+**[Go to Top](#contents)**
 
 ### Htop - Linux Process Monitoring
 
@@ -659,6 +698,8 @@ $ sudo yum install htop
 |Kill a Process|F9|`k`|
 |Quit|F10|`q`|
 
+**[Go to Top](#contents)**
+
 ### Lsof - List Open Files
 
 - The lsof command is used in many Linux/Unix-like systems to display a list of all the open files and the processes.
@@ -693,6 +734,8 @@ $ sudo yum install htop
 - `lsof -p 1` : Shows whose PID is 1. 
 - `kill -9 "lsof -t -u user_name"` : Kill all the processes of the **user_name** user.
 
+**[Go to Top](#contents)**
+
 ### monit
 
 - Monit is a free and open source software that acts as process supervision.
@@ -704,3 +747,159 @@ $ sudo yum install htop
 - [Show All Running Processes in Linux using ps/htop commands](https://www.cyberciti.biz/faq/show-all-running-processes-in-linux/)
 - [20 Command Line Tools to Monitor Linux Performance](https://www.tecmint.com/command-line-tools-to-monitor-linux-performance/)
 - [How to install and use Monit on Ubuntu/Debian Linux server as process supervision tool](https://www.cyberciti.biz/faq/how-to-install-and-use-monit-on-ubuntudebian-linux-server/)
+
+**[Go to Top](#contents)**
+
+## Memory: Monitoring Usage and Tuning
+
+- aka. RAM is your physical memory.
+- Virtual memory = Swap space available on the disk + Physical memory. The virtual memory contains both user space and kernel space.
+- Using either 32-bit or 64-bit system makes a big difference in determining how much memory a process can utilize.
+- On a 32-bit system a process can only access a maximum of **4GB** virtual memory. On a 64-bit system there is **no** such limitation.
+- The unused RAM will be used as file system cache by the kernel.
+- The Linux system will swap when it needs more memory. i.e when it needs more memory than the physical memory. When it swaps, it writes the least used memory pages from the physical memory to the swap space on the disk.
+- Lot of swapping can cause performance issues, as the disk is much slower than the physical memory, and it takes time to swap the memory pages from RAM to disk
+- [Monitoring Memory Usage with](#vmstat---virtual-memory-statistics) [*vmstat*](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-tool_reference-vmstat)
+
+### Profiling Application Memory Usage with Valgrind
+
+- [Valgrind](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-monitoring_and_diagnosing_performance_problems)
+- The valgrind ships with a number of tools that can be used to profile and analyze program performance.
+- The valgrind tools outlined in this section can help you to detect memory errors such as uninitialized memory use and improper memory allocation or deallocation.
+
+**Profiling Memory Usage with *Memcheck***
+
+- Memcheck is the default valgrind tool. It detects and reports on a number of memory errors that can be difficult to detect and diagnose, such as:
+    - Memory access that should not occur
+    - Undefined or uninitialized value use
+    - Incorrectly freed heap memory
+    - Pointer overlap
+    - Memory leaks
+- **NOT: Memcheck can only report these errors; it cannot prevent them from occurring.**
+
+**Profiling Cache Usage with *Cachegrind***
+
+- Cachegrind simulates application interaction with a system's cache hierarchy and branch predictor.
+- It tracks usage of the simulated first level instruction and data caches to detect poor code interaction with this level of cache, also tracks the last level of cache (second or third level) in order to track memory access. As such, applications executed with cachegrind run twenty to one hundred times slower than usual.
+- Cachegrind gathers statistics for the duration of application execution and outputs a summary to the console. 
+- Cachegrind also provides the cg_diff tool, which makes it easier to chart program performance before and after a code change.
+- The resulting output file can be viewed in greater detail with the cg_annotate tool.
+- Cachegrind writes detailed profiling information to a per-process cachegrind.out.pid file, where pid is the process identifier.
+
+**[Go to Top](#contents)**
+
+**Profiling Heap and Stack Space with Massif**
+
+- Massif measures the heap space used by a specified application.
+- It measures both useful space and any additional space allocated for bookkeeping and alignment purposes.
+- massif helps you understand how you can reduce your application's memory use to increase execution speed and reduce the likelihood that your application will exhaust system swap space. Applications executed with massif run about twenty times slower than usual.
+- You can also use the following options to focus massif output on a specific problem.
+    - **--heap**
+    - **--heap-admin**
+    - **--stacks**
+    - **--time-unit**
+- Massif outputs profiling data to a massif.out.pid file, where pid is the process identifier of the specified application.
+- The ms_print tool graphs this profiling data to show memory consumption over the execution of the application, as well as detailed information about the sites responsible for allocation at points of peak memory allocation
+
+**References**
+
+- [Linux Performance Monitoring and Tuning Introduction](https://www.thegeekstuff.com/2011/03/linux-performance-monitoring-intro/)
+- [7.2. MONITORING AND DIAGNOSING PERFORMANCE PROBLEMS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-monitoring_and_diagnosing_performance_problems)
+- [Performance Monitoring Tools](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/performance_tuning_guide/index)
+
+## I/O Monitoring and Tuning
+
+**Vmstat**
+
+ - [Vmstat](#vmstat---virtual-memory-statistics) reports on processes, memory, paging, block I/O, interrupts, and CPU activity across the entire system. It can help administrators determine whether the I/O subsystem is responsible for any performance issues.
+ - The information most relevant to I/O performance is in the following columns:
+     - **si** : Swap in, or reads from swap space, in KB.
+     - **so** : Swap out, or writes to swap space, in KB.
+     - **bi** : Block in, or block write operations, in KB.
+     - **bo** : Block out, or block read operations, in KB.
+     - **wa** : The portion of the queue that is waiting for I/O operations to complete.
+- Swap in and swap out are particularly useful when your swap space and your data are on the same device, and as indicators of memory usage.
+- Additionally, the free, buff, and cache columns can help identify write-back frequency. A sudden drop in cache values and an increase in free values indicates that write-back and page cache invalidation has begun.
+- If analysis with vmstat shows that the I/O subsystem is responsible for reduced performance, administrators can use iostat to determine the responsible I/O device.
+
+**[Go to Top](#contents)**
+
+**Monitoring I/O Performance with iostat**
+
+- **iostat** is provided by the sysstat package.
+- It reports on I/O device load in your system.
+- If analysis with vmstat shows that the I/O subsystem is responsible for reduced performance, you can use iostat to determine the I/O device responsible.
+- You can focus the output of iostat reports on a specific device by using the parameters defined in the iostat man page.
+
+**Detailed I/O Analysis with blktrace**
+
+- **Blktrace** provides detailed information about how time is spent in the I/O subsystem.
+- The companion utility **blkparse** reads the raw output from **blktrace** and produces a human readable summary of input and output operations recorded by **blktrace**.
+
+**Analyzing blktrace Output with btt**
+
+- The btt utility is provided as part of the blktrace package.
+- It analyzes **blktrace** output and displays the amount of time that data spends in each area of the I/O stack, making it easier to spot bottlenecks in the I/O subsystem.
+- Some of the important events tracked by the **blktrace** mechanism and analyzed by btt are:
+    - Queuing of the I/O event (Q)
+    - Dispatch of the I/O to the driver event (D)
+    - Completion of I/O event (C)
+- You can include or exclude factors involved with I/O performance issues by examining combinations of events.
+- To inspect the timing of sub-portions of each I/O device, look at the timing between captured blktrace events for the I/O device.
+- If the device takes a long time to service a request (D2C), the device may be overloaded, or the workload sent to the device may be sub-optimal.
+- If block I/O is queued for a long time before being dispatched to the storage device (Q2G), it may indicate that the storage in use is unable to serve the I/O load. 
+- Looking at the timing across adjacent I/O can provide insight into some types of bottleneck situations
+
+**Analyzing blktrace Output with iowatcher**
+
+- The iowatcher tool can use blktrace output to graph I/O over time.
+- It focuses on the Logical Block Address (LBA) of disk I/O, throughput in megabytes per second, the number of seeks per second, and I/O operations per second. This can help to identify when you are hitting the operations-per-second limit of a device.
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [MONITORING AND DIAGNOSING PERFORMANCE PROBLEMS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-storage_and_file_systems-monitoring_and_diagnosing_performance_problems)
+- [FACTORS AFFECTING I/O AND FILE SYSTEM PERFORMANCE](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/factors-affecting-i-o-and-file-system-performance_monitoring-and-managing-system-status-and-performance)
+- [6 best tools to monitor disk IO performance in Linux](https://www.2daygeek.com/linux-disk-io-performance-monitoring/)
+
+##  I/O Scheduling
+
+- I/O schedulers exist as a way to optimize disk access requests. They traditionally do this by merging I/O requests to similar locations on disk. By grouping requests located at similar sections of disk, the drive doesn't need to "seek" as often, improving the overall response time for disk operations.
+- On modern Linux implementations, there are several I/O scheduler options available. Each of these have their own unique method of scheduling disk access requests. 
+
+**CFQ**
+
+- The Complete Fairness Queueing (CFQ) I/O scheduler works by creating a per-process I/O queue.
+- The goal of this I/O scheduler is to provide a fair I/O priority to each process. 
+- While the CFQ algorithm is complex, the gist of this scheduler is that after ordering the queues to reduce disk seeking, it services these per-process I/O queues in a round-robin fashion. What this means for performance is that the CFQ scheduler tries to provide each process with the same priority for disk access.
+
+**Deadline**
+
+- The Deadline scheduler works by creating two queues: a read queue and a write queue. Each I/O request has a time stamp associated that is used by the kernel for an expiration time.
+- While this scheduler also attempts to service the queues based on the most efficient ordering possible, the timeout acts as a "deadline" for each I/O request. When an I/O request reaches its deadline, it is pushed to the highest priority.
+- While tunable, the default "deadline" values are **500 ms for Read** operations and **5,000 ms for Write** operations.
+
+**Noop**
+
+- The Noop scheduler is a unique scheduler. 
+- Rather than prioritizing specific I/O operations, it simply places all I/O requests into a FIFO (First in, First Out) queue. While this scheduler does try to merge similar requests, that is the extent of the complexity of this scheduler.
+- This scheduler is optimized for systems that essentially do not need an I/O scheduler. 
+- This scheduler can be used in numerous scenarios such as environments where the underlying disk infrastructure is performing I/O scheduling on Virtual Machines.
+- Since a VM is running within a Host Server/OS, that host already may have an I/O scheduler in use. In this scenario, each disk operation is passing through two I/O schedulers: one for the VM and one for the VM Host.
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [Improving Linux System Performance with I/O Scheduler Tuning](https://www.cloudbees.com/blog/linux-io-scheduler-tuning)
+- [Linux I/O Scheduler](https://www.thomas-krenn.com/de/wiki/Linux_I/O_Scheduler)
+- [Linux I/O Schedulers](https://www.admin-magazine.com/HPC/Articles/Linux-I-O-Schedulers)
+
+## Linux Filesystems and the VFS
+
+- 
+
+**References**
+
+- [Overview of the Linux Virtual File System](https://www.kernel.org/doc/html/latest/filesystems/vfs.html)
