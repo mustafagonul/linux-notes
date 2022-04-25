@@ -38,6 +38,8 @@
 8. [I/O Monitoring and Tuning](#io-monitoring-and-tuning)
 9. [I/O Scheduling](#io-scheduling)
 10. [Linux Filesystems and the VFS](#linux-filesystems-and-the-vfs)
+11. [Disk Partitioning](#disk-partitioning)
+12. [Th ext2/ext3/ext4 Filesystems](#th-ext2ext3ext4-filesystems)
 ---
 
 ## Linux Filesystem Tree Layout
@@ -898,8 +900,108 @@ $ sudo yum install htop
 
 ## Linux Filesystems and the VFS
 
-- 
+**Linux Filesystem**
+
+- Every file in Linux is represented by an inode. An inode is the combination of an identification number and some additional file description data, some of which includes:
+    - The file's location on the hard drive
+    - The file's creation and modification dates
+    - The file's owner
+    - The file's size
+    - The file's permissions
+- Anything other than a process is a file. Examples include regular files (such as a text document), directories, special files (such as input/output devices), links, sockets, pipes and block devices.
+- A partition contains the set of all file types. Data partitions host all the files and swap partitions contain expanded computer memory.
+- The Virtual File System (also known as the Virtual Filesystem Switch) is the software layer in the kernel that provides the filesystem interface to user space programs. It also provides an abstraction within the kernel which allows different filesystem implementations to coexist.
+- VFS system calls open(2), stat(2), read(2), write(2), chmod(2) and so on are called from a process context.
+
+**Directory Entry Cache (dcache)**
+
+- The VFS implements the open(2), stat(2), chmod(2), and similar system calls. The pathname argument that is passed to them is used by the VFS to search through the directory entry cache (also known as the dentry cache or dcache). This provides a very fast look-up mechanism to translate a pathname (filename) into a specific dentry. Dentries live in RAM and are never saved to disc: they exist only for performance.
+
+- The dentry cache is meant to be a view into your entire filespace. As most computers cannot fit all dentries in the RAM at the same time, some bits of the cache are missing. In order to resolve your pathname into a dentry, the VFS may have to resort to creating dentries along the way, and then loading the inode. This is done by looking up the inode.
+
+**The Inode Object**
+
+- An individual dentry usually has a pointer to an inode. Inodes are filesystem objects such as regular files, directories, FIFOs and other beasts. They live either on the disc (for block device filesystems) or in the memory (for pseudo filesystems). Inodes that live on the disc are copied into the memory when required and changes to the inode are written back to disc.
+- To look up an inode requires that the VFS calls the lookup() method of the parent directory inode. This method is installed by the specific filesystem implementation that the inode lives in. Once the VFS has the required dentry (and hence the inode), we can do all those boring things like open(2) the file, or stat(2) it to peek at the inode data. The stat(2) operation is fairly simple: once the VFS has the dentry, it peeks at the inode data and passes some of it back to userspace.
+
+**The File Object**
+
+- Opening a file requires another operation: allocation of a file structure (this is the kernel-side implementation of file descriptors). The freshly allocated file structure is initialized with a pointer to the dentry and a set of file operation member functions. These are taken from the inode data. The open() file method is then called so the specific filesystem implementation can do its work. You can see that this is another switch performed by the VFS. The file structure is placed into the file descriptor table for the process.
+- Reading, writing and closing files (and other assorted VFS operations) is done by using the userspace file descriptor to grab the appropriate file structure, and then calling the required file structure method to do whatever is required. For as long as the file is open, it keeps the dentry in use, which in turn means that the VFS inode is still in use.
+
+**[Go to Top](#contents)**
 
 **References**
 
 - [Overview of the Linux Virtual File System](https://www.kernel.org/doc/html/latest/filesystems/vfs.html)
+
+## Disk Partitioning
+
+- Disk Partitioning is the process of dividing a disk into one or more logical areas, often known as partitions, on which the user can work separately. It is one step of disk formatting.
+-  If a partition is created, the disk will store the information about the location and size of partitions in the partition table. With the partition table, each partition can appear to the operating system as a logical disk, and users can read and write data on those disks.
+-  The main advantage of disk partitioning is that each partition can be managed separately.
+- We need disk partitioning to upgrade Hard Disk (to incorporate new Hard Disk to the system), dual Booting (Multiple Operating Systems on the same system), efficient disk management, ensure backup and security and work with different File Systems using the same system.
+
+- In order to successfully partition a disk and to make it useful, we need to ensure that, we have completed the below four steps, regardless of the Operating system and Hardware of the system.
+    - Attach disk on the proper port
+    - Create partitions in the disk
+    - Create a file system on the partition
+    - Mounting the file systems
+- To view the available Hard Disks in our system, use the command `lsblk`.
+- We can use the `fdisk -l` command to find out where the Hard Disk we are going to partition is located.
+- While partitioning, we should be aware of certain factors. 
+    - On a disk, we can have a maximum of four partitions
+    - The partitions are of two types
+        - Primary
+        - Extended
+    - Extended partitions can have logical partitions inside it
+    - Among the four possible partitions, the possible combinations are
+        - All 4 primary partitions
+        - 3 primary partitions and 1 extended partition
+- Common `fdisk` flags.
+
+```
+m  -> help
+p  -> print partition table
+n  -> create new partition
+d  -> delete partition
+q  -> quit without writing
+w  -> write to disk
+```
+
+**References**
+
+- [Disk Partitioning in Linux](https://www.geeksforgeeks.org/disk-partitioning-in-linux/)
+
+## Th ext2/ext3/ext4 Filesystems
+
+**The ext2 Filesystem**
+
+- The ext2 filesystem (second extended filesystem) was created in 1993. It was based on the Minix filesystem created in 1987, and the ext filesystem created in 1992. These original filesystems were good starting points, but they soon ran into limitations as Linux grew in popularity and usage. Some of the advantages of ext2 are:
+    - ext2 is suitable for flash drives and USB drives.
+    - A file can be between 16 GB and 2 TB in size.
+    - An ext2 filesystem can be between 2 TB and 32 TB in size.
+- There are also some disadvantages that come with using the ext2 filesystem:
+    - ext2 filesystems are likely to become corrupt during power failures and computer crashes when data is being saved to the disk.
+    - ext2 filesystems face data fragmentation issues which hinder performance.
+
+**The ext3 Filesystem**
+
+- The ext3 filesystem (third extended filesystem) was introduced in November of 2001. While file sizes and total filesystem size remained the same as with ext2, there were also many improvements:
+    - ext3 allows journaling. Journaling creates a separate area of the filesystem where all file changes are tracked. The Journal can then be used in case of a power failure or system crash to restore data.
+    - A directory in ext3 can have up to 32,000 subdirectories.
+
+**The ext4 Filesystem**
+
+- The ext4 filesystem (fourth extended Filesystem) was introduced in 2008. Although considered an interim filesystem until a new filesystem could be developed, ext4 brought the following benefits:
+    - A directory can have up to 64,000 subdirectories.
+    - A file can be up to 16 TB in size.
+    - An ext4 filesystem can be up to 1 EB (Exabyte) in size, although most Linux distributions recommend a maximum filesystem size of 100 Tb.
+    - ext4 reduces fragmentation issues and increases performance.
+    - ext4 provides an option to turn off the journaling feature.
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [Linux Filesystems: Types & Features](https://study.com/academy/lesson/linux-filesystems-types-features.html#lesson)
