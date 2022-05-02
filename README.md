@@ -40,6 +40,11 @@
 10. [Linux Filesystems and the VFS](#linux-filesystems-and-the-vfs)
 11. [Disk Partitioning](#disk-partitioning)
 12. [Th ext2/ext3/ext4 Filesystems](#th-ext2ext3ext4-filesystems)
+14. [The XFS and btrfs Filesystems](#the-xfs-and-btrfs-filesystems)
+15. [Encrypting Disks](#encrypting-disks)
+16. [Logical Volume Manager](#logical-volume-manager)
+17. [RAID](#raid)
+18. [Kernel Services and Configuration](#kernel-services-and-configuration)
 ---
 
 ## Linux Filesystem Tree Layout
@@ -1005,3 +1010,193 @@ w  -> write to disk
 **References**
 
 - [Linux Filesystems: Types & Features](https://study.com/academy/lesson/linux-filesystems-types-features.html#lesson)
+
+## The XFS and btrfs Filesystems
+
+**The XFS Filesystem**
+
+- XFS is a highly scalable, high-performance file system which was originally designed at Silicon Graphics, Inc. XFS is the default file system for Red Hat Enterprise Linux 7.
+- Main Features of XFS:
+    - XFS supports metadata journaling, which facilitates quicker crash recovery.
+    - The XFS file system can be defragmented and enlarged while mounted and active.
+    - In addition, Red Hat Enterprise Linux 7 supports backup and restore utilities specific to XFS.
+- Allocation Features:
+    - Extent-based allocation
+    - Stripe-aware allocation policies
+    - Delayed allocation
+    - Space pre-allocation
+- Other XFS Features
+    - Extended attributes (xattr)
+        - This allows the system to associate several additional name/value pairs per file. It is enabled by default.
+    - Quota journaling
+        - This avoids the need for lengthy quota consistency checks after a crash.
+    - Project/directory quotas
+        - This allows quota restrictions over a directory tree.
+    - Subsecond timestamps
+        - This allows timestamps to go to the subsecond.
+    - Default `atime` behavior is `relatime`
+        - `Relatime` is on by default for XFS. It has almost no overhead compared to `noatime` while still maintaining sane `atime` values.
+
+**btrfs Filesystem**
+
+- Btrfs (B-Tree Filesystem) is a modern copy-on-write (CoW) filesystem for Linux. Btrfs aims to implement many advanced filesystem features while focusing on fault tolerance, repair, and easy administration. The btrfs filesystem is designed to support the requirement of high performance and large storage servers. It is suitable for petabyte-scale data centers as well as cellular smartphones.In this article, I am going to discuss the Btrfs filesystem and its features
+
+- **The main Btrfs features include:**
+    - Extent based file storage (2^64 max file size)
+        - In an extent based filesystem, the storage unit is called an extent. An extent is a contiguous area of storage that is reserved for a file. One file requires one extent, no matter how small the file is. For larger files (file size larger than the extent size), multiple extents will be required. For larger files, metadata will be used to keep track of the extents the file are using. In the Btrfs filesystem, the metadata is significantly smaller in size. Smaller metadata improves storage efficiency and the performance of the filesystem.
+    - Space efficient packing of small files
+        - Normally, no matter how small a file is, it will require one block or one extent to store the file. This wastes a lot of disk space. To solve this problem, the Btrfs filesystem embeds smaller files in the metadata to store smaller files efficiently.
+    - Space efficient indexed directories
+        - The btrfs filesystem directories are indexed in two different ways. For filename lookup, key-based indexing is used. To reference data, inode-based key indexing is used. Two-level indexing improves directory/file lookup performance and reduces storage requirements for the indexes.
+    - Dynamic inode allocation
+        - You need 1 inode to reference 1 file. Many filesystems (i.e., Ext4) have a fixed number of inodes. So, if you create too many small files, you may have a lot of space left on your disk, but you won’t be able to create any new files. You also can’t increase the maximum number of inodes once the filesystem is created.
+        - Btrfs solves this problem by allocating inodes dynamically as they are required. So, you can create as many files as you want as long as you have free disk space.
+    - Writable snapshots
+        -  The Btrfs filesystem supports snapshots. You can take a snapshot of the current filesystem, which you can use to restore your data if you have accidentally removed some files or corrupted some data.
+        - By default, the btrfs snapshots are read-only. Once you’ve taken a read-only snapshot, you can’t change any files/directories in that snapshot. In any case, if you want to change any files/directories after you have taken a snapshot of your existing Btrfs filesystem, you can change the read-only snapshot to a writable snapshot and modify any files/directories in that snapshot.
+    - Subvolumes (separate internal filesystem roots)
+        - A Btrfs filesystem can have many subvolumes. A subvolume is a named binary tree (B-tree) (or internal/logical filesystem root) of the existing filesystem root tree (main) of the btrfs filesystem. A subvolume is not a block device of its own. But, you can mount Btrfs subvolumes individually. You can think of subvolumes as namespaces.
+    - Data mirroring and striping
+        -  If you have added multiple storage devices in the same btrfs filesystem, all the data written to one storage device will be written to all the other storage devices. This is called data mirroring. RAID-1 uses the data mirroring feature extensively.
+        - If you have added multiple storage devices in the same btrfs filesystem, btrfs can store the same file on different physical devices/partitions. This is called data striping. Data striping improves the read/write performance of the filesystem. RAID-0 uses the data striping feature extensively.
+    - Checksums on data and metadata (multiple algorithms available)
+    - Compression
+    - Integrated multiple device support, with several raid algorithms
+    - Offline filesystem check
+    - Efficient incremental backup and FS mirroring
+    - Online filesystem defragmentation
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [THE XFS FILE SYSTEM](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-xfs)
+- [BTRFS](https://www.kernel.org/doc/html/latest/filesystems/btrfs.html)
+- [Btrfs Wikipedia](https://en.wikipedia.org/wiki/Btrfs)
+
+## Encrypting Disks
+
+**Cryptsetup**
+
+- Cryptsetup is a tool that we can use for disk encryption. It’s based on DM-Crypt, which is an encryption subsystem in the Linux kernel. Not only can it encrypt hard drives, but it can also encrypt removable media and files.
+- Cryptsetup uses the LUKS (Linux Unified Key Setup) standard. LUKS is designed to provide disk encryption specifications to facilitate compatibility among a wide range of distributions. Therefore, we should prefer to use LUKS for partition encryption.
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [Encrypting data partitions using LUKS](https://www.ibm.com/docs/en/order-management-sw/10.0?topic=considerations-encrypting-data-partitions-using-luks)
+- [How to Encrypt a Partition in Linux](https://www.baeldung.com/linux/encrypt-partition)
+
+## Logical Volume Manager (LVM)
+
+- LVM is a tool for logical volume management which includes allocating disks, striping, mirroring and resizing logical volumes.
+- With LVM, a hard drive or set of hard drives is allocated to one or more physical volumes. LVM physical volumes can be placed on other block devices which might span two or more disks.
+- The physical volumes are combined into logical volumes, with the exception of the `/boot` partition. The `/boot` partition cannot be on a logical volume group because the boot loader cannot read it. If the root (`/`) partition is on a logical volume, create a separate `/boot` partition which is not a part of a volume group.
+- Since a physical volume cannot span over multiple drives, to span over more than one drive, create one or more physical volumes per drive.
+- The volume groups can be divided into logical volumes, which are assigned mount points, such as `/home` and `/` and file system types, such as ext2 or ext3. When "partitions" reach their full capacity, free space from the volume group can be added to the logical volume to increase the size of the partition. When a new hard drive is added to the system, it can be added to the volume group, and partitions that are logical volumes can be increased in size.
+- On the other hand, if a system is partitioned with the ext3 file system, the hard drive is divided into partitions of defined sizes. If a partition becomes full, it is not easy to expand the size of the partition. Even if the partition is moved to another hard drive, the original hard drive space has to be reallocated as a different partition or not used.
+
+**LVM Configuration**
+
+- LVM can be configured during the graphical installation process, the text-based installation process, or during a kickstart installation (`system-config-lvm`).
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [Logical Volume Manager (Linux)](https://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux))
+- [CHAPTER 11. LVM (LOGICAL VOLUME MANAGER)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-lvm)
+- [A Linux user's guide to Logical Volume Management](https://opensource.com/business/16/9/linux-users-guide-lvm)
+- [11.2. LVM CONFIGURATION](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/s-lvm-config)
+- [LVM (Logical Volume Management)](https://bidb.itu.edu.tr/seyir-defteri/blog/2013/09/06/lvm-(logical-volume-management))
+
+## RAID
+
+- RAID ("redundant array of inexpensive disks" or "redundant array of independent disks") is a data storage virtualization technology that combines multiple physical disk drive components into one or more logical units for the purposes of data redundancy, performance improvement, or both. This was in contrast to the previous concept of highly reliable mainframe disk drives referred to as "single large expensive disk" (SLED).
+- Data is distributed across the drives in one of several ways, referred to as RAID levels, depending on the required level of redundancy and performance. The different schemes, or data distribution layouts, are named by the word "RAID" followed by a number, for example RAID 0 or RAID 1. Each scheme, or RAID level, provides a different balance among the key goals: reliability, availability, performance, and capacity. RAID levels greater than RAID 0 provide protection against unrecoverable sector read errors, as well as against failures of whole physical drives.
+
+**Standard levels**
+
+- Originally, there were five standard levels of RAID, but many variations have evolved, including several nested levels and many non-standard levels (mostly proprietary). RAID levels and their associated data formats are standardized by the Storage Networking Industry Association (SNIA) in the Common RAID Disk Drive Format (DDF) standard:[16][17]
+
+- **RAID 0** consists of striping, but no mirroring or parity. 
+- **RAID 1** consists of data mirroring, without parity or striping.
+- **RAID 2** consists of bit-level striping with dedicated Hamming-code parity. 
+- **RAID 3** consists of byte-level striping with dedicated parity.
+- **RAID 4** consists of block-level striping with dedicated parity.
+- **RAID 5** consists of block-level striping with distributed parity.
+- **RAID 6** consists of block-level striping with double distributed parity. 
+
+**[Go to Top](#contents)**
+
+**References**
+
+- [RAID](https://en.wikipedia.org/wiki/RAID)
+- [Linux Raid](https://raid.wiki.kernel.org/index.php/Linux_Raid)
+- [What is RAID in Linux?](https://dzone.com/articles/what-is-raid-in-linux)
+- [RAID](https://tr.wikipedia.org/wiki/RAID)
+
+## Kernel Services and Configuration
+
+### Kernel Services
+
+- Kernel services are routines that provide the runtime kernel environment to programs executing in kernel mode. Kernel extensions call kernel services, which resemble library routines. In contrast, application programs call library routines.
+
+**Kernel services descriptions**
+
+- **I/O Kernel Services**
+    -This overview lists the various I/O kernel services.
+- **Block I/O Buffer Cache Kernel Services: Overview**
+    - The Block I/O Buffer Cache services are provided to support user access to device drivers through block I/O special files.
+- **Understanding Interrupts**
+    - Each hardware interrupt has an interrupt level, trigger, and interrupt priority.
+- **Understanding DMA Transfers**
+    - AIX® DMA support deals with the issues of direct memory access by I/O devices to and from system memory.
+- **Kernel Extension and Device Driver Management Services**
+    - The kernel provides a set of program and device driver management services. These services include kernel extension loading and unloading services and device driver binding services.
+- **Locking Kernel Services**
+    - The kernel services can be locked using any of the methods that are described in this overview.
+- **File Descriptor Management Services**
+    - The File Descriptor Management services are supplied by the logical file system for creating, using, and maintaining file descriptors. These services allow for the implementation of system calls that use a file descriptor as a parameter, create a file descriptor, or return file descriptors to calling applications.
+- **Logical File System Kernel Services**
+    - The Logical File System services (also known as the fp_services) allow processes running in kernel mode to open and manipulate files in the same way that user-mode processes do. Data access limitations make it unreasonable to accomplish these tasks with system calls, so a subset of the file system calls has been provided with an alternate kernel-only interface.
+- **Programmed I/O (PIO) Kernel Services**
+    - This overview provides a list of PIO kernel services with a brief description.
+- **Memory Kernel Services**
+    -The Memory kernel services provide kernel extensions certain abilities that are listed in this section.
+- **Understanding Virtual Memory Manager Interfaces**
+    - The virtual memory manager supports functions that allow a wide range of kernel extension data operations.
+- **Message Queue Kernel Services**
+    - The Message Queue kernel services provide the message queue functions to a kernel extension.
+- **Network Kernel Services**
+    - The Network kernel services provide kernel extensions certain abilities that are listed in this overview.
+- **Process and Exception Management Kernel Services**
+    - The process and exception management kernel services provided by the base kernel provide the capability to perform the actions that are listed in this section.
+- **RAS Kernel Services**
+    - The Reliability, Availability, and Serviceability (RAS) kernel services are used to record the occurrence of hardware or software failures and to capture data about these failures.
+- **Security Kernel Services**
+    - The Security kernel services provide methods for controlling the auditing system and for determining the access rights to objects for the invoking process.
+- **Timer and Time-of-Day Kernel Services**
+    - The Timer and Time-of-Day kernel services provide kernel extensions with the ability to be notified when a period of time has passed.
+- **Using Fine Granularity Timer Services and Structures**
+    - The talloc, tstart, tstop, and tfree services provide fine-resolution timing functions.
+- **Using Multiprocessor-Safe Timer Services**
+    - On a multiprocessor system, timer request blocks and watchdog timer structures could be accessed simultaneously by several processors.
+- **Virtual File System (VFS) Kernel Services**
+    -The Virtual File System (VFS) kernel services are provided as fundamental building blocks for use when writing a virtual file system.
+
+### Kernel Configuration
+
+- The Linux kernel configuration is usually found in the kernel source in the file: /usr/src/linux/.config .
+- Configuration options:
+    - `make config` - starts a character based questions and answer session
+    - `make menuconfig` - starts a terminal-oriented configuration tool (using ncurses)
+    - `make xconfig` - starts a X based configuration tool
+
+**[Go to Top](#contents)**
+
+**References** 
+
+- [Chapter 4. Kernel Configuration](https://tldp.org/HOWTO/SCSI-2.4-HOWTO/kconfig.html#:~:text=The%20Linux%20kernel%20configuration%20is,based%20questions%20and%20answer%20session)
+- [Kernel Services](https://www.ibm.com/docs/en/aix/7.2?topic=concepts-kernel-services) 
