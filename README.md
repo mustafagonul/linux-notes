@@ -45,6 +45,9 @@
 16. [Logical Volume Manager](#logical-volume-manager)
 17. [RAID](#raid)
 18. [Kernel Services and Configuration](#kernel-services-and-configuration)
+19. [Kernel Modules](#kernel-modules)
+20. [Devices and Udev](#devices-and-udev)
+21. [Virtualization Overview](#virtualization)
 ---
 
 ## Linux Filesystem Tree Layout
@@ -1200,3 +1203,137 @@ w  -> write to disk
 
 - [Chapter 4. Kernel Configuration](https://tldp.org/HOWTO/SCSI-2.4-HOWTO/kconfig.html#:~:text=The%20Linux%20kernel%20configuration%20is,based%20questions%20and%20answer%20session)
 - [Kernel Services](https://www.ibm.com/docs/en/aix/7.2?topic=concepts-kernel-services) 
+
+## Kernel Modules
+
+- Modules are pieces of code that can be loaded and unloaded into the kernel upon demand. They extend the functionality of the kernel without the need to reboot the system.
+- `lsmod` : To list all currently loaded modules in Linux, we can use the lsmod (list modules) command.
+- `insmod` : To load a kernel module, we can use the insmod (insert module) command. Here, we have to specify the full path of the module.
+- `rmmod` :  To unload a kernel module, we use the rmmod (remove module) command.
+- `modprobe` : **modprobe** is an intelligent command for listing, inserting as well as removing modules from the kernel.
+
+
+**[Go to Top](#contents)**
+
+**References** 
+
+- [The Linux Kernel Module Programming Guide](https://linux.die.net/lkmpg/x40.html)
+- [How to Load and Unload Kernel Modules in Linux](https://www.tecmint.com/load-and-unload-kernel-modules-in-linux/#:~:text=A%20kernel%20module%20is%20a,the%20functionality%20of%20the%20kernel.)
+
+## Devices and Udev
+
+- udev - Linux configurable dynamic device naming support
+- udev provides a dynamic device directory containing only the files for actually present devices. It creates or removes device node files usually located in the /dev directory, or it renames network interfaces.
+- As part of the **hotplug** subsystem, udev is executed if a kernel device is added or removed from the system.
+- On device creation, udev reads the sysfs directory of the given device to collect device attributes like label, serial number or bus device number. These attributes may be used as keys to determine a unique name for the device.
+- udev maintains a database for devices present on the system. On device removal, udev queries its database for the name of the device file to be deleted.
+
+**[Go to Top](#contents)**
+
+**References** 
+
+- [An introduction to Udev: The Linux subsystem for managing device events](https://opensource.com/article/18/11/udev#:~:text=to%20our%20newsletter.-,An%20introduction%20to%20Udev%3A%20The%20Linux%20subsystem%20for%20managing%20device,specific%20device%20is%20plugged%20in.&text=Udev%20is%20the%20Linux%20subsystem%20that%20supplies%20your%20computer%20with%20device%20events.)
+- [udev(8) - Linux man page](https://linux.die.net/man/8/udev)
+
+## Virtualization Overview
+
+- Virtualization is technology that allows you to create multiple simulated environments or dedicated resources from a single, physical hardware system. 
+- Software called a hypervisor connects directly to that hardware and allows you to split 1 system into separate, distinct, and secure environments known as virtual machines (VMs).
+
+### Hypervisor
+
+- A hypervisor is software that creates and runs virtual machines (VMs). A hypervisor, sometimes called a virtual machine monitor (VMM), isolates the hypervisor operating system and resources from the virtual machines and enables the creation and management of those VMs.
+- **Types of hypervisors**
+    - Type 1:
+        - A type 1 hypervisor, also referred to as a native or bare metal hypervisor, runs directly on the host’s hardware to manage guest operating systems. It takes the place of a host operating system and VM resources are scheduled directly to the hardware by the hypervisor. 
+        - This type of hypervisor is most common in an enterprise data center or other server-based environments.
+        - KVM, Microsoft Hyper-V, and VMware vSphere are examples of a type 1 hypervisor.
+    - Type 2:
+        - A type 2 hypervisor is also known as a hosted hypervisor, and is run on a conventional operating system as a software layer or application.
+        - It works by abstracting guest operating systems from the host operating system. VM resources are scheduled against a host operating system, which is then executed against the hardware. 
+        - A type 2 hypervisor is better for individual users who want to run multiple operating systems on a personal computer. 
+        - VMware Workstation and Oracle VirtualBox are examples of a type 2 hypervisor.
+- The hypervisor treats resources—like CPU, memory, and storage—as a pool that can be easily reallocated between existing guests or to new virtual machines.
+- All hypervisors need some operating system-level components—such as a memory manager, process scheduler, input/output (I/O) stack, device drivers, security manager, a network stack, and more—to run VMs.
+- The hypervisor gives each virtual machine the resources that have been allocated and manages the scheduling of VM resources against the physical resources.
+- Linux Amazon Machine Images use one of two types of virtualization: paravirtual (PV) or hardware virtual machine (HVM). The main differences between PV and HVM AMIs are the way in which they boot and whether they can take advantage of special hardware extensions (CPU, network, and storage) for better performance.
+
+### Hardware Virtual Machine (HVM)
+
+- HVM AMIs are presented with a fully virtualized set of hardware and boot by executing the master boot record of the root block device of your image. This virtualization type provides the ability to run an operating system directly on top of a virtual machine without any modification, as if it were run on the bare-metal hardware. The Amazon EC2 host system emulates some or all of the underlying hardware that is presented to the guest.
+
+### Paravirtual (PV)
+
+- PV AMIs boot with a special boot loader called PV-GRUB, which starts the boot cycle and then chain loads the kernel specified in the menu.lst file on your image. Paravirtual guests can run on host hardware that does not have explicit support for virtualization. Historically, PV guests had better performance than HVM guests in many cases, but because of enhancements in HVM virtualization and the availability of PV drivers for HVM AMIs, this is no longer true. For more information about PV-GRUB and its use in Amazon EC2, see User provided kernels.
+
+### libvirt
+
+- is a toolkit to manage virtualization platforms
+- is accessible from C, Python, Perl, Go and more
+- is licensed under open source licenses
+- supports KVM, Hypervisor.framework, QEMU, Xen, Virtuozzo, VMWare ESX, LXC, BHyve and more
+- targets Linux, FreeBSD, Windows and macOS
+- is used by many applications
+
+### Xen Hypervisors
+
+- The Xen Project is the home for several virtualization-related open source projects. The community is focused on advancing virtualization in a number of different commercial and open source applications, including server virtualization, Infrastructure as a Services (IaaS), desktop virtualization, security applications, embedded and hardware appliances, and automotive/aviation.
+- The Xen Project develops virtualization technologies powering the world’s largest clouds in production and is the foundation of many commercial virtualization products from Citrix, Huawei, Inspur, and Oracle.
+
+### Kernel Virtual Machine (KVM)
+
+- KVM (for Kernel-based Virtual Machine) is a full virtualization solution for Linux on x86 hardware containing virtualization extensions (Intel VT or AMD-V). It consists of a loadable kernel module, kvm.ko, that provides the core virtualization infrastructure and a processor specific module, kvm-intel.ko or kvm-amd.ko.
+- Using KVM, one can run multiple virtual machines running unmodified Linux or Windows images. Each virtual machine has private virtualized hardware: a network card, disk, graphics adapter, etc.
+- KVM is open source software. The kernel component of KVM is included in mainline Linux, as of 2.6.20. The userspace component of KVM is included in mainline QEMU, as of 1.3.
+
+### Linux Container
+
+- A Linux container is a set of 1 or more processes that are isolated from the rest of the system.
+- All the files necessary to run them are provided from a distinct image, meaning Linux containers are portable and consistent as they move from development, to testing, and finally to production. 
+- The container that holds your application has the necessary libraries, dependencies, and files so you can move it through production without nasty side effects.
+The container that holds your application has the necessary libraries, dependencies, and files so you can move it through production without nasty side effects.
+
+**Linux Containers project (LXC)**
+
+- The Linux Containers project (LXC) is an open source container platform that provides a set of tools, templates, libraries, and language bindings. LXC has a simple command line interface that improves the user experience when starting containers.
+-LXC offers an operating-system level virtualization environment that is available to be installed on many Linux-based systems. Your Linux distribution may have it available through its package repository.
+
+**Docker**
+
+- The word "Docker" refers to several things, including an open source community project; tools from the open source project; Docker Inc., the company that primarily supports that project; and the tools that company formally supports.
+- The IT software "Docker” is containerization technology that enables the creation and use of Linux® containers.
+- The open source Docker community works to improve these technologies to benefit all users.
+- The company, Docker Inc., builds on the work of the Docker community, makes it more secure, and shares those advancements back to the greater community. It then supports the improved and hardened technologies for enterprise customers.
+
+**VirtualBox**
+
+- VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for enterprise as well as home use. Not only is VirtualBox an extremely feature rich, high performance product for enterprise customers, it is also the only professional solution that is freely available as Open Source Software under the terms of the GNU General Public License (GPL) version 2. See "About VirtualBox" for an introduction.
+
+**OpenVZ**
+
+- Multiple secure, isolated Linux containers (otherwise known as VEs or VPSs) on a single physical server enabling better server utilization and ensuring that applications do not conflict.
+
+### Vagrant 
+
+-  Vagrant is a tool for building and managing virtual machine environments in a single workflow. With an easy-to-use workflow and focus on automation, Vagrant lowers development environment setup time, increases production parity.
+
+### Packer
+
+- Packer is an open source tool that enables you to create identical machine images for multiple platforms from a single source template. A common use case is creating "golden images" that teams across an organization can use in cloud infrastructure.
+
+**[Go to Top](#contents)**
+
+**References** 
+
+- [Understanding virtualization](https://www.redhat.com/en/topics/virtualization)
+- [What is a hypervisor?](https://www.redhat.com/en/topics/virtualization/what-is-a-hypervisor)
+- [What's a Linux container?](https://www.redhat.com/en/topics/containers/whats-a-linux-container)
+- [What is Docker?](https://www.redhat.com/en/topics/containers/what-is-docker)
+- [VirtualBox](https://www.virtualbox.org/)
+- [OpenVZ](https://openvz.org/)
+- [Linux AMI virtualization types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/virtualization_types.html)
+- [libvirt](https://libvirt.org/)
+- [Xen Hypervisor](https://xenproject.org/)
+- [Kernel Virtual Machine](https://www.linux-kvm.org/page/Main_Page)
+- [Vagrant](https://www.vagrantup.com/intro)
+- [Packer](https://www.packer.io/docs)
